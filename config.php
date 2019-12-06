@@ -1,7 +1,7 @@
 <html>
 <?php
-define('db_servername', "julian.fufufu.moe");
-#define('db_servername', "127.0.0.1");
+#define('db_servername', "julian.fufufu.moe");
+define('db_servername', "127.0.0.1");
 define('db_username', "pmauser");
 define('db_password', "4153108");
 define('db_database', "a_prime");

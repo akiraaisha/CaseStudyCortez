@@ -5212,8 +5212,9 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 @media only screen and (min-width: 1200px) {
   .ui.container {
     width: 1127px;
-    margin-left: auto !important;
+   /* margin-left: auto !important;
     margin-right: auto !important;
+    */
   }
 
   .ui.grid.container {

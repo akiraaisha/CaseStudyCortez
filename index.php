@@ -1,16 +1,37 @@
 <?php
     include('config.php');
-    if(isset($_POST['login_button'])) {
-$user = $_POST['username'];
-$pass = $_POST['password'];
+    //include('session.php');
+    session_start();
 
-if( $user && $pass ) {
-setcookie("authorization","ok" );
-header( "Location:auth.php");
-exit();
-}
-}
+    if($_SERVER["REQUEST_METHOD"] == "POST") {
+        // username and password sent from form
+        $myusername = mysqli_real_escape_string($db_conn,$_POST['username']);
+        $mypassword = mysqli_real_escape_string($db_conn,$_POST['password']);
+
+        $sql = "SELECT id FROM login WHERE username='$myusername' and password='$mypassword'";
+        $result = mysqli_query($db_conn,$sql);
+        $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+        $active = $row['active'];
+
+        $count = mysqli_num_rows($result);
+
+        // If result matched $myusername and $mypassword, table row must be 1 row
+        if($count == 1) {
+            //session_register("myusername");
+            $_SESSION['login_user'] = $myusername;
+            header("location: displaytables.php");
+        }
+        else {
+            $error = "Your Login Name or Password is invalid";
+        }
+
+    }
+
+    if (isset($_SESSION['login_user'])) {
+        header("location: displaytables.php");
+    }
 ?>
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -96,7 +117,7 @@ exit();
                 Homeowner Login
             </div>
         </h2>
-        <form class="ui large form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" autocomplete="off" method = "post">
+        <form class="ui large form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" autocomplete="off">
             <div class="ui stacked segment">
                 <div class="field">
                     <div class="ui left icon input">
@@ -116,5 +137,6 @@ exit();
         </form>
     </div>
 </div>
+
 </body>
 </html>
