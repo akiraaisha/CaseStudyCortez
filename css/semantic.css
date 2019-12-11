@@ -21365,7 +21365,7 @@ ol.ui.horizontal.list li:before,
 /* Preserve Rows Spacing on Consecutive Grids */
 
 .ui.grid + .grid {
-  margin-top: 1rem;
+  margin-top: 3rem;
 }
 
 /*-------------------

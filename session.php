@@ -1,7 +1,6 @@
 <?php
     include('config.php');
     session_start();
-
     $user_check = $_SESSION['login_user'];
 
     $ses_sql = mysqli_query($db_conn,"select username from login where username = '$user_check' ");

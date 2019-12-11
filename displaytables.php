@@ -5,27 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
+    <link rek="stylesheet" type="text/css" href="css/styles.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"
             integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
             crossorigin="anonymous"></script>
     <script src="css/semantic.js"></script>
+    <link rek="stylesheet" type="text/css" href="../css/styles.css">
+
     <style>
-        th {text-align: center;
-            color: #35a862;
-            background-color: #d9ffc7;
-        }
-        tr:nth-child(even) {
-            background: #ffffff;
-        }
-        tr:nth-child(odd) {
-            background: #eaeaea;
-        }
         body {
-            min-height: 2000px;
             -webkit-font-smoothing: antialiased;
             -moz-font-smoothing: grayscale;
+            background: #dedede;
         }
 
+        .forms {
+            margin-top: 2% !important;
+            margin-left: 2% !important;
+        }
         .ui.borderless.menu {
             background-color: #f8f8f8;
             box-shadow: none;
@@ -81,6 +78,20 @@
             line-height: 1.4;
             font-weight: 300;
         }
+        table {
+            border-collapse: collapse;
+
+        }
+
+        th, td {
+            text-align: center;
+            padding: 8px;
+            border: 1px black;
+        }
+
+        tr:nth-child(even) {background-color: rgba(130, 255, 128, 0.22);}
+        tr:hover {background-color: rgba(127, 245, 85, 0.4);}
+        td:hover {background-color: rgba(130, 255, 123, 0.22);}
     </style>
 </head>
 <body>
@@ -90,15 +101,15 @@
             <a class="header item">A-Prime Homeowner Association</a>
             <a class="active item">Home</a>
             <a class="item" href="add.php">Add Data</a>
+            <a class="item" href="payment.php">Payment</a>
             <a class="item" href="logout.php">Logout</a>
         </div>
     </div>
 </div>
-<table class="ui table celled" style="width:50%; margin-left: auto;margin-right: auto;margin-top: 5%">
+<table class="ui table celled" style="width:95%; margin-left: auto;margin-right: auto;margin-top: 2%">
     <tr>
         <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
+        <th>Name</th>
         <th>Type</th>
         <th>Number</th>
         <th>Street</th>
@@ -113,19 +124,18 @@
     $sql = "SELECT member.id, Fname, Lname, type, DateSince, addressNumber, street 
 FROM a_prime.member 
 INNER JOIN a_prime.member_type mt ON mt.id=member.member_type_id
-INNER JOIN a_prime.streets st ON st.id=member.streets_id ORDER BY ID ASC";
+INNER JOIN a_prime.streets st ON st.id=member.streets_id ORDER BY ID ASC LIMIT 20";
 
     $result = $db_conn->query($sql);
     if($result->num_rows > 0) {
         while($row = $result-> fetch_assoc()) {
-            echo "<tr><td>" . $row["id"];
-            echo "</td><td>" . $row["Fname"];
-            echo   "</td><td>" . $row["Lname"] .
+            echo "<tr><td>" ."<div style=text-align:center>". $row["id"];
+            echo "</td><td>" ."<div style=text-align:center>". $row["Fname"]. " " . $row["Lname"] .
                 "</td><td style='text-align: center'>" . $row["type"] .
                 "</td><td style='text-align: center'>" . $row["addressNumber"] .
-                "</td><td>" . $row["street"]. "</td>".
-                "</td><td>" . $row["DateSince"]. "</td>";
-             echo "</td><td>" ."<div style=text-align:center><a href=# >EDIT</a>"."<br><a href=# style=text-align:center>INFO</a></div>";
+                "</td><td>" ."<div style=text-align:center>". $row["street"]. "</td>".
+                "</td><td>" ."<div style=text-align:center>" . $row["DateSince"]. "</td>";
+             echo "</td><td>" ."<a href=# >EDIT</a>"."<br><a href=# style=text-align:center>INFO</a></div>";
         }
     }
 

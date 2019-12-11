@@ -1,11 +1,11 @@
 <?php
-    require_once ('session.php');
+require_once ('session.php');
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Title</title>
+    <title>Table with database</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
@@ -17,20 +17,24 @@
     <link rel="stylesheet" type="text/css" href="css/components/button.css">
     <script src="css/components/form.js"></script>
     <link rel="stylesheet" type="text/css" href="css/components/divider.css">
-    <link rel="stylesheet" type="text/css" href="css/components/input.css">
+    <link rel="stylesheet" type="text/css" href="css/components/input.css.css">
     <link rek="stylesheet" type="text/css" href="../css/styles.css">
-
     <style>
+        th {text-align: center;
+            color: #35a862;
+            background-color: #d9ffc7;
+        }
+        tr:nth-child(even) {
+            background: #ffffff;
+        }
+        tr:nth-child(odd) {
+            background: #eaeaea;
+        }
         body {
             -webkit-font-smoothing: antialiased;
             -moz-font-smoothing: grayscale;
-            background: #dedede;
         }
 
-        .forms {
-            margin-top: 2% !important;
-            margin-left: 2% !important;
-        }
         .ui.borderless.menu {
             background-color: #f8f8f8;
             box-shadow: none;
@@ -99,8 +103,8 @@
         <div class="ui container">
             <a class="header item">A-Prime Homeowner Association</a>
             <a class="item" href="index.php">Home</a>
-            <a class="active item" href="add.php">Add Data</a>
-            <a class="item" href="payment.php">Payment</a>
+            <a class="item" href="add.php">Add Data</a>
+            <a class="item active" href="payment.php">Payment</a>
             <a class="item" href="logout.php">Logout</a>
         </div>
     </div>
@@ -112,126 +116,60 @@
         <div class="ui form" >
             <div class="ui segment gray" style="background-color: #f9f9f9">
                 <div class="fields">
-                    <div class="field">
-                        <label>First name</label>
-                        <input type="text" placeholder="First Name" name="FirstName" id="FirstName" autocomplete="off">
-                    </div>
-                    <div class="field">
-                        <label>Last Name</label>
-                        <input type="text" placeholder="Last Name" name="LastName" autocomplete="off">
-                    </div>
-                    <div class="field">
-                        <label>Type</label>
-                        <select class="field ui search dropdown" name="type">
-                            <div class="text" contenteditable="true"></div>
-                            <option value="" selected disabled hidden>Type</option>
-                            <?php
-                                //require_once ('config.php');
-                                $sql_type = "SELECT id, type from member_type";
-                                $result = $db_conn->query($sql_type);
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<option value=".html_entity_decode('&quot;');
-                                        echo $row["id"].html_entity_decode('&quot;');
-                                        echo ">". $row["type"]. "</option>". "\n";
-                                    }
-                                }
-                            ?>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="ui divider"></div>
-
-                <div class="fields">
-                    <div class="field" style="width:10em">
-                        <label>Number</label>
-                        <input type="text" pattern="\d{0,9}" max="3" maxlength="3"name="number" placeholder="House Number" autocomplete="off">
-                    </div>
-                    <div class="field" style="width:10em">
-                        <label>Date Since</label>
-                        <input type="text" pattern="\d{0,9}" max="4" maxlength="4" minlength="4" name="since" placeholder="Year" autocomplete="off">
-                    </div>
-                    <div class="field" style="width:5em">
-                        <label>Street</label>
-
-                        <select class="ui search dropdown" name="street">
-                            <option value="" selected disabled hidden>Street</option>
+                    <div class="field">
+                        <label>Member Name</label>
+                        <select class="ui search dropdown" name="id">
+                            <option value="" selected disabled hidden>Member</option>
                             <?php
                                 //require_once ('session.php');
-                                $sql_streets = "SELECT DISTINCT id, street from streets ORDER BY street ASC";
-                                $result = $db_conn->query($sql_streets);
+                                $sql_members = "SELECT DISTINCT id, concat(fname,' ', lname) AS Fullname FROM member ORDER BY id ASC";
+                                $result = $db_conn->query($sql_members);
                                 if ($result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
                                         echo "<option value=".html_entity_decode('&quot;');
                                         echo $row["id"] .html_entity_decode('&quot;') . ">";
-                                        echo $row["street"]. "</option>". "\n";
+                                        echo $row["Fullname"]. "</option>". "\n";
                                     }
                                 }
                             ?>
                         </select>
                     </div>
+                    <div class="field">
+                        <label>Amount</label>
+                        <input type="number" pattern="\d{0,9}" placeholder="PHP" name="amount" id="amount" autocomplete="off">
+                    </div>
                 </div>
+                <!--                    FOR BUTTONS-->
                 <div class="ui" style="align-items: center;display: flex;justify-content: center;">
                     <button class="ui primary button submit">Submit</button>
                     <button class="green ui button">Preview</button>
                     <input value="Clear" type="button" class="ui button" onclick="this.form.reset();document.getElementsByName('type').value ='';"/>
                 </div>
-            </div>
-        </div>
-        <div class="ui error message"><i class="close icon"></i></div>
-        <?php
-            //require_once ('session.php');
-            if($_SERVER["REQUEST_METHOD"] == "POST") {
-                //$FirstName = $_POST["FirstName"];
-
-                // username and password sent from form
-                $FirstName = mysqli_real_escape_string($db_conn, $_POST['FirstName']);
-                $LastName = mysqli_real_escape_string($db_conn, $_POST['LastName']);
-                $memberType = mysqli_real_escape_string($db_conn, $_POST['type']);
-                $dateSince = mysqli_real_escape_string($db_conn, $_POST['since']);
-                $HouseNumber = mysqli_real_escape_string($db_conn, $_POST['number']);
-                $street = mysqli_real_escape_string($db_conn, $_POST['street']);
-
-                $sql = "INSERT INTO member (id, Fname, Lname, DateSince, addressNumber, member_type_id, streets_id) VALUES 
-                                    (null, '$FirstName', '$LastName', '$dateSince', '$HouseNumber', '$memberType', '$street')";
-                //$query  = mysqli_query($db_conn, $sql);
-
-                if (mysqli_query($db_conn, $sql)) {
-                    echo "<div class=\"ui positive message\">
-  <i class=\"close icon\"></i>
-  <div class=\"header\">
-   Input Successful!
-  </div>
-  Go to <a class=\"ui\" href=\"/displaytables.php\">Home</a>?
-</div>";
-                } else {
-                    echo "Error: " . $sql . "<br>" . mysqli_error($db_conn);
-                    echo "<div class=\"ui negative message compact\">";
-                    echo "<i class=\"close icon\"></i>";
-                    echo "<div class=\"header\">Error: $sql  <br>";
-                    echo "mysqli_error($db_conn)</div></p></div>";
-                }
-            }
-            mysqli_close($db_conn);
-        ?>
     </form>
-
 </div>
+<?php
+    //require_once ('session.php');
+    echo date('Y-m-d'). "<br>";
+    if($_SERVER["REQUEST_METHOD"] == "POST") {
+        //$FirstName = $_POST["FirstName"];
 
+        // username and password sent from form
+        $FirstName = mysqli_real_escape_string($db_conn, $_POST['id']);
+        $LastName = mysqli_real_escape_string($db_conn, $_POST['amount']);
 
+echo $FirstName. "<br>";
+echo $LastName. "<br>";
 
+//        $sql = "INSERT INTO member (id, Fname, Lname, DateSince, addressNumber, member_type_id, streets_id) VALUES
+//                                    (null, '$FirstName', '$LastName', '$dateSince', '$HouseNumber', '$memberType', '$street')";
+        //$query  = mysqli_query($db_conn, $sql);
+    }
+    mysqli_close($db_conn);
+?>
 <script>
     $('.ui.dropdown')
         .dropdown();
-    $('.message .close')
-        .on('click', function() {
-            $(this)
-                .closest('.message')
-                .transition('fade')
-            ;
-        })
-    ;
     $('.ui.form')
         .form({
             fields: {
@@ -267,15 +205,21 @@
                     rules: [
                         {
                             type   : 'empty',
-                            prompt : 'Please enter a Last Name'
+                            prompt : 'Please enter a username'
                         }
                     ]
+                },
+                Clear: {
+                    identifier: 'clear'
                 }
+
             }
         })
     ;
+
+    function resetFunction() {
+        document.getElementById("form").reset();
+    }
 </script>
 </body>
 </html>
-
-
