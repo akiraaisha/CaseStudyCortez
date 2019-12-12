@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Title</title>
+    <title>A-Prime</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
@@ -94,14 +94,17 @@
     </style>
 </head>
 <body>
-<div class="ui tablet computer only padded grid">
-    <div class="ui borderless fluid huge menu">
+<div class="ui tablet computer only padded grid" >
+    <div class="ui borderless fluid huge menu" >
         <div class="ui container">
             <a class="header item">A-Prime Homeowner Association</a>
             <a class="item" href="index.php">Home</a>
-            <a class="active item" href="add.php">Add Data</a>
+            <a class="active item" href="add.php">Add Member</a>
             <a class="item" href="payment.php">Payment</a>
             <a class="item" href="logout.php">Logout</a>
+            <a>
+            <div class="ui right aligned" style="width:95%; margin-left: auto;margin-right: auto;margin-top: 3.6em; text-align: right"></div>
+            </a>
         </div>
     </div>
 </div>
@@ -230,8 +233,7 @@
                 .closest('.message')
                 .transition('fade')
             ;
-        })
-    ;
+        });
     $('.ui.form')
         .form({
             fields: {

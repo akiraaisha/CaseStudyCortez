@@ -1,7 +1,11 @@
+<?php
+    require_once ('session.php');
+    error_reporting(E_ALL ^ E_NOTICE);
+?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Table with database</title>
+    <title>A-Prime</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
@@ -11,6 +15,8 @@
             crossorigin="anonymous"></script>
     <script src="css/semantic.js"></script>
     <link rek="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="css/components/search.css">
+    <script src="css/components/search.js"></script>
 
     <style>
         body {
@@ -92,21 +98,38 @@
         tr:nth-child(even) {background-color: rgba(130, 255, 128, 0.22);}
         tr:hover {background-color: rgba(127, 245, 85, 0.4);}
         td:hover {background-color: rgba(130, 255, 123, 0.22);}
+
+
     </style>
 </head>
 <body>
-<div class="ui tablet computer only padded grid">
+<div class="ui computer only padded grid">
     <div class="ui borderless fluid huge menu">
         <div class="ui container">
             <a class="header item">A-Prime Homeowner Association</a>
             <a class="active item">Home</a>
-            <a class="item" href="add.php">Add Data</a>
+            <a class="item" href="add.php">Add Member</a>
             <a class="item" href="payment.php">Payment</a>
             <a class="item" href="logout.php">Logout</a>
+
         </div>
+        <a><div class="ui right aligned" style="width:95%; margin-left: auto;margin-right: auto;margin-top: .5em; text-align: right">
+                <div class="ui search">
+                    <div class="ui icon input">
+                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="GET" class="ui form">
+                            <input class="prompt" type="text" placeholder="Search..." name="search" value="" autocomplete="off">
+                        </form>
+                    </div>
+                    <div class="results"></div>
+                </div>
+            </div></a>
     </div>
 </div>
-<table class="ui table celled" style="width:95%; margin-left: auto;margin-right: auto;margin-top: 2%">
+
+
+
+
+<table class="ui table celled" style="width:95%; margin-left: auto;margin-right: auto;margin-top: 2em; margin-bottom: 2em;">
     <tr>
         <th>ID</th>
         <th>Name</th>
@@ -117,28 +140,59 @@
         <th></th>
 
     </tr>
-
-<?php
-    #include('config.php');
-    include('session.php');
-    $sql = "SELECT member.id, Fname, Lname, type, DateSince, addressNumber, street 
-FROM a_prime.member 
-INNER JOIN a_prime.member_type mt ON mt.id=member.member_type_id
-INNER JOIN a_prime.streets st ON st.id=member.streets_id ORDER BY ID ASC LIMIT 20";
-
-    $result = $db_conn->query($sql);
-    if($result->num_rows > 0) {
-        while($row = $result-> fetch_assoc()) {
-            echo "<tr><td>" ."<div style=text-align:center>". $row["id"];
-            echo "</td><td>" ."<div style=text-align:center>". $row["Fname"]. " " . $row["Lname"] .
-                "</td><td style='text-align: center'>" . $row["type"] .
-                "</td><td style='text-align: center'>" . $row["addressNumber"] .
-                "</td><td>" ."<div style=text-align:center>". $row["street"]. "</td>".
-                "</td><td>" ."<div style=text-align:center>" . $row["DateSince"]. "</td>";
-             echo "</td><td>" ."<a href=# >EDIT</a>"."<br><a href=# style=text-align:center>INFO</a></div>";
+    <?php
+        //require_once('session.php');
+        if($_SERVER["REQUEST_METHOD"] == "GET") {
+            $SEARCH = mysqli_real_escape_string($db_conn, $_GET['search']);
+            $SQL_SEARCH = "
+SELECT member.id, Fname, Lname, type, DateSince, addressNumber, street 
+FROM member INNER JOIN a_prime.member_type mt ON mt.id=member.member_type_id
+INNER JOIN a_prime.streets st ON st.id=member.streets_id 
+WHERE lname LIKE '%$SEARCH%'
+OR fname LIKE '%$SEARCH%'
+OR addressNumber LIKE '%$SEARCH' 
+OR street LIKE '%$SEARCH%'
+OR type LIKE '%$SEARCH%'
+OR DateSince LIKE '%$SEARCH%' 
+ORDER BY member.id ASC LIMIT 50";
+            $result = $db_conn->query($SQL_SEARCH);
+            if($result->num_rows > 0) {
+                while($row = $result-> fetch_assoc()) {
+                    echo "<tr><td>" ."<div style=text-align:center>". $row["id"];
+                    echo "</td><td>" ."<div style=text-align:center>". $row["Fname"]. " " . $row["Lname"] .
+                        "</td><td style='text-align: center'>" . $row["type"] .
+                        "</td><td style='text-align: center'>" . $row["addressNumber"] .
+                        "</td><td>" ."<div style=text-align:center>". $row["street"]. "</td>".
+                        "</td><td>" ."<div style=text-align:center>" . $row["DateSince"]. "</td>";
+                    echo "</td><td>" ."<div style=text-align:center>". "<a class='ui info' 
+                    onclick=\"window.open('/information.php?id=". $row["id"]. "','newwindow','width=650,height=750');return false;\" href=/information.php?id=".
+                        $row["id"]. ">Information</a></div>";
+                }
+            }
         }
-    }
-
- ?>
+    ?>
+</table>
+<?php
+    //include('config.php');
+//    //include('session.php');
+//    $sql = "SELECT member.id, Fname, Lname, type, DateSince, addressNumber, street
+//FROM a_prime.member
+//INNER JOIN a_prime.member_type mt ON mt.id=member.member_type_id
+//INNER JOIN a_prime.streets st ON st.id=member.streets_id ORDER BY ID ASC";
+//
+//    $result = $db_conn->query($sql);
+//    if($result->num_rows > 0) {
+//        while($row = $result-> fetch_assoc()) {
+//            echo "<tr><td>" ."<div style=text-align:center>". $row["id"];
+//            echo "</td><td>" ."<div style=text-align:center>". $row["Fname"]. " " . $row["Lname"] .
+//                "</td><td style='text-align: center'>" . $row["type"] .
+//                "</td><td style='text-align: center'>" . $row["addressNumber"] .
+//                "</td><td>" ."<div style=text-align:center>". $row["street"]. "</td>".
+//                "</td><td>" ."<div style=text-align:center>" . $row["DateSince"]. "</td>";
+//             echo "</td><td>" ."<a href=# >EDIT</a>"."<br><a href=# style=text-align:center>INFO</a></div>";
+//        }
+//    }
+//
+// ?>
 </body>
 </html>

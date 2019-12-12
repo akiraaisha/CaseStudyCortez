@@ -1,11 +1,15 @@
 <?php
 require_once ('session.php');
+$myUniqueID = uniqid('0x', false);
+$currentTime= date('h:i:s A');
+$currentDate = date('Y-m-d');
+$currentDateTime= date('Y-m-d H:i:s');
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Table with database</title>
+    <title>A-Prime</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/semantic.css">
@@ -20,6 +24,11 @@ require_once ('session.php');
     <link rel="stylesheet" type="text/css" href="css/components/input.css.css">
     <link rek="stylesheet" type="text/css" href="../css/styles.css">
     <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-font-smoothing: grayscale;
+            background: #dedede;
+        }
         th {text-align: center;
             color: #35a862;
             background-color: #d9ffc7;
@@ -103,9 +112,12 @@ require_once ('session.php');
         <div class="ui container">
             <a class="header item">A-Prime Homeowner Association</a>
             <a class="item" href="index.php">Home</a>
-            <a class="item" href="add.php">Add Data</a>
+            <a class="item" href="add.php">Add Member</a>
             <a class="item active" href="payment.php">Payment</a>
             <a class="item" href="logout.php">Logout</a>
+            <a>
+                <div class="ui right aligned" style="width:95%; margin-left: auto;margin-right: auto;margin-top: 3.6em; text-align: right"></div>
+            </a>
         </div>
     </div>
 </div>
@@ -113,10 +125,9 @@ require_once ('session.php');
 
 <div class="ui middle aligned center aligned grid error">
     <form class="ui form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-        <div class="ui form" >
+        <div class="ui form">
             <div class="ui segment gray" style="background-color: #f9f9f9">
                 <div class="fields">
-
                     <div class="field">
                         <label>Member Name</label>
                         <select class="ui search dropdown" name="id">
@@ -132,6 +143,7 @@ require_once ('session.php');
                                         echo $row["Fullname"]. "</option>". "\n";
                                     }
                                 }
+
                             ?>
                         </select>
                     </div>
@@ -140,54 +152,100 @@ require_once ('session.php');
                         <input type="number" pattern="\d{0,9}" placeholder="PHP" name="amount" id="amount" autocomplete="off">
                     </div>
                 </div>
+                <div class="ui divider"></div>
+                <div class="ui" style="align-items: center;display: flex;justify-content: center">
+                <div class="fields cet">
+                    <div class="ui field left aligned" style="align-items: inherit;justify-content: left; margin-right: 50px">
+                        <label>Transaction Number:</label>
+                        <a><?php echo $myUniqueID;?></a>
+                    </div>
+
+                    <div class="field" style="align-items: inherit;justify-content: right;">
+                        <label>Current DateTime:</label>
+                        <a><?php echo $currentDate;?></a><br>
+                        <a><?php echo $currentTime;?></a>
+                        </div>
+                    </div>
+            </div>
                 <!--                    FOR BUTTONS-->
-                <div class="ui" style="align-items: center;display: flex;justify-content: center;">
+                <div class="ui divider"></div>
+                <div class="ui" style="align-items: center;display: flex;justify-content: center; margin-top: 1em;">
                     <button class="ui primary button submit">Submit</button>
                     <button class="green ui button">Preview</button>
                     <input value="Clear" type="button" class="ui button" onclick="this.form.reset();document.getElementsByName('type').value ='';"/>
                 </div>
-    </form>
-</div>
+                </div>
+                </div>
+
+
+
+    <div class="ui error message"><i class="close icon"></i></div>
+
+
+
+
 <?php
     //require_once ('session.php');
-    echo date('Y-m-d'). "<br>";
+   //echo date('Y-m-d'). "<br>";
+
     if($_SERVER["REQUEST_METHOD"] == "POST") {
         //$FirstName = $_POST["FirstName"];
 
         // username and password sent from form
-        $FirstName = mysqli_real_escape_string($db_conn, $_POST['id']);
-        $LastName = mysqli_real_escape_string($db_conn, $_POST['amount']);
+        $memberID = mysqli_real_escape_string($db_conn, $_POST['id']);
+        $payedAmount = mysqli_real_escape_string($db_conn, $_POST['amount']);
 
-echo $FirstName. "<br>";
-echo $LastName. "<br>";
 
-//        $sql = "INSERT INTO member (id, Fname, Lname, DateSince, addressNumber, member_type_id, streets_id) VALUES
-//                                    (null, '$FirstName', '$LastName', '$dateSince', '$HouseNumber', '$memberType', '$street')";
-        //$query  = mysqli_query($db_conn, $sql);
-    }
+//       $payment_sql = "INSERT INTO payment (id, member_id, amount, datePayed, TransNumber) VALUES
+//                                           // (null, '$memberID', '$payedAmount', '$currentDate', '$myUniqueID')";
+        $payment_sql = "INSERT INTO payment(id, member_id, amount, datePayed, TransNumber)
+                                    SELECT null, '$memberID','$payedAmount', '$currentDateTime', '$myUniqueID' FROM DUAL
+                                    WHERE NOT EXISTS(SELECT TransNumber FROM payment WHERE TransNumber='$myUniqueID')";
+
+        $query  = mysqli_query($db_conn, $payment_sql);
+
+        if (mysqli_query($db_conn, $payment_sql)) {
+                    echo "<div class=\"ui positive message\">
+  <i class=\"close icon\"></i>
+  <div class=\"header\">
+   Input Successful!
+  </div>
+  Go to <a class=\"ui\" href=\"/displaytables.php\">Home</a>?
+</div>";
+                } else {
+                    echo "Error: " . $payment_sql . "<br>" . mysqli_error($db_conn);
+                    echo "<div class=\"ui negative message compact\">";
+                    echo "<i class=\"close icon\"></i>";
+                    echo "<div class=\"header\">Error: $payment_sql  <br>";
+                    echo "mysqli_error($db_conn)</div></p></div>";
+                }
+            }
     mysqli_close($db_conn);
 ?>
+    </form>
+</div>
+
 <script>
     $('.ui.dropdown')
         .dropdown();
     $('.ui.form')
         .form({
             fields: {
-                type: {
-                    identifier: 'type',
+                memberID: {
+                    identifier: 'id',
                     rules: [
                         {
                             type   : 'empty',
-                            prompt : 'Please enter Type'
+                            prompt : 'Please select a Member'
                         }
                     ]
                 },
-                number: {
-                    identifier: 'number',
+                amount: {
+                    identifier: 'amount',
                     rules: [
                         {
                             type   : 'empty',
-                            prompt : 'Please enter House Number'
+                            prompt : 'Please enter an Amount'
                         }
                     ]
                 },
@@ -220,6 +278,13 @@ echo $LastName. "<br>";
     function resetFunction() {
         document.getElementById("form").reset();
     }
+    $('.message .close')
+        .on('click', function() {
+            $(this)
+                .closest('.message')
+                .transition('fade')
+            ;
+        });
 </script>
 </body>
 </html>
